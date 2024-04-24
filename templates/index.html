@@ -3,13 +3,108 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>电影数据可视化</title>
-    <link rel="stylesheet" href="../static/css/index.css" />
-  </head>
+    <title>电影数据可视化</title>     
+    <style>  
+      /* 搜索表单的样式 */  
+      #search-form {  
+          display: flex;  
+          align-items: center;  
+          justify-content: center;  
+          margin-top: 20px;  
+      }  
+    
+      /* 输入框的样式 */  
+      #movie-name {  
+          padding: 10px;  
+          font-size: 16px;  
+          border: 1px solid #ccc;  
+          border-radius: 4px;  
+          width: 300px;  
+          margin-right: 10px;  
+      }  
+    
+      /* 搜索按钮的样式 */  
+      #search-form button {  
+          padding: 10px 20px;  
+          font-size: 16px;  
+          background-color: #4CAF50; /* 绿色 */  
+          border: none;  
+          border-radius: 4px;  
+          color: white;  
+          cursor: pointer;  
+      }  
+    
+      /* 鼠标悬停在按钮上时改变按钮的样式 */  
+      #search-form button:hover {  
+          background-color: #45a049; /* 更深的绿色 */  
+      }  
+        /* 按钮样式 */  
+        .button-style {  
+            display: inline-block;  
+            padding: 10px 20px;  
+            font-size: 16px;  
+            color: white;  
+            background-color: #4CAF50; /* 绿色背景 */  
+            border: none;  
+            border-radius: 4px; /* 圆角 */  
+            cursor: pointer; /* 鼠标悬停时变为手形 */  
+            text-align: center;  
+            text-decoration: none;  
+            transition-duration: 0.4s; /* 过渡效果 */  
+          }  
+          
+          .button-style:hover {  
+            background-color: #45a049; /* 鼠标悬停时改变背景色 */  
+            color: white;  
+            text-decoration: none; 
 
+    </style>
+    <link rel="stylesheet" href="../static/css/index.css" />
+    <a href="index2.html"class="button-style">可视化2</a>
+    <script src="../static/js/jquery-3.6.0.min.js"></script> 
+    <script>    
+      $(document).ready(function() {    
+          $('#search-form').submit(function(event) {    
+              event.preventDefault();    
+                
+              var movieName = $('#movie-name').val();    
+                
+              $.ajax({    
+                  url: '/search',    
+                  type: 'POST',    
+                  data: { movieName: movieName },    
+                  dataType: 'json',    
+                  success: function(response) {    
+                      if (response.movie) {    
+                          var movieInfo = '<div class="movie-info">';    
+                          for (var key in response.movie) {    
+                              // 直接在<p>标签中添加style属性来设置文字颜色为红色  
+                              movieInfo += '<p style="color: white;">' + key + ': ' + response.movie[key] + '</p>';    
+                          }    
+                          movieInfo += '</div>';    
+                          $('#movie-info').html(movieInfo);    
+                      } else {    
+                          // 如果没有找到电影，则显示相应的消息，并且也设置文字颜色为红色  
+                          $('#movie-info').html('<p style="color: white;">电影未找到。</p>');    
+                      }    
+                  },    
+                  error: function(jqXHR, textStatus, errorThrown) {    
+                      console.error('AJAX请求失败: ' + textStatus, errorThrown);    
+                  }    
+              });    
+          });    
+      });    
+  </script>
+
+  </head>
   <body>
+
     <header>
-      <h1>电影数据可视化</h1>
+      <form id="search-form" method="post"> 
+          <input type="text" id="movie-name" name="movieName" placeholder="输入电影名称"> 
+          <button type="submit">搜索</button>  
+      </form> 
+      
       <div class="showTime"></div>
       <script>
         var t = null;
@@ -27,7 +122,11 @@
             "当前时间：" + y + "年" + mt + "月" + day + "-" + h +  "时" + m + "分" + s + "秒";
           t = setTimeout(time, 1000); //设定定时器，循环运行
         }
-      </script>     &
+      </script> 
+      
+         &
+      
+
     </header>
     <!-- 页面主体部分 -->
     <section class="mainbox">  
@@ -41,46 +140,58 @@
                 <div class="panel-footer"></div>  
             </div> 
         <div class="panel line">
-          <div class="chart">图表
+          <div class="chart">
             <div id="scatter-chart">  
             {{ scatter_chart_html | safe }}  
         </div>  
     </div>
-          
+    
           <div class="panel-footer"></div>
         </div>
         <div class="panel pie">
-          <div class="chart">图表</div>
+          {{ pie_chart_html | safe }} 
+          <div class="chart"> </div>
+          
           <div class="panel-footer"></div>
         </div>
       </div>
       <div class="column">
         <!-- 地图模块 -->
         <div class="map">
+
+         
+
+          <div id="movie-info"></div> 
+          
           <div class="map1"></div>
+          
           <div class="map2"></div>
+          
           <div class="map3"></div>
+          
           <div class="chart"></div>
+         
         </div>
       </div>
       <div class="column">
         <div class="panel bar2">
-          <h2>柱形图-就业行业</h2>
-          <div class="chart">图表</div>
+          {{ scatter_plot_html | safe }} 
+         
           <div class="panel-footer"></div>
         </div>
         <div class="panel line2">
-          <h2>折线图-播放量</h2>
-          <div class="chart">图表</div>
+          
           <div class="panel-footer"></div>
+          {{ pie_chart_data_html | safe }}
         </div>
         <div class="panel pie2">
-          <h2>饼形图-地区分布</h2>
-          <div class="chart">图表</div>
+          <div class="chart">{{ line_chart_html | safe }}</div>
           <div class="panel-footer"></div>
         </div>
       </div>
-    </section>   
+    </section>
+
+
   </body>
   <script src="../static/js/flexible.js"></script>
   <script src="../static/js/plotly-latest.min.js"></script>
